@@ -1,0 +1,267 @@
+---
+title: "A primer on zzlite"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{A-primer-on-zzlite}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>"
+)
+```
+
+The `zzlite` package is a collection of functions that simplifies communication between R and the [Zamzar Online file conversion](https://developers.zamzar.com/user) API.  
+
+By utilizing `zzlite` (and thereby the Zamzar API) you can easily convert between [hundreds](https://developers.zamzar.com/formats) of file formats from an R session.*  
+
+## The basics
+
+The following section serves as a simple introduction to the `zzlite` package. Since Zamzar requires authentication, it is assumed that you have a valid (and not exhausted) key at your disposal. If not, go sign up via [Zamzar](https://developers.zamzar.com/)s website to get one. Otherwise, keep on reading.  
+
+
+### On Zamzar API keys in `zzlite`
+
+There's two ways in which you can pass a Zamzar key to `zzlite`.  
+
+1. Either by passing a hard coded Zamzar key as an argument to the `usr` parameter.  
+
+2. Or by leveraging an `.Renviron` file. Simply create a variable called `ZAMZAR_USR` in your `.Renviron` and pass it a Zamzar key. If done successfully, you can skip passing a key to the `usr` parameter whenever you're invoking `zzlite` functions.  
+
+
+<center>_Example of .Renviron:_</center>
+```sh
+## Zamzar key used by zzlite 
+ZAMZAR_USR=77c39dh6lo03g7598t98h659ihg99b7ny7213q
+
+
+
+
+```
+
+For security reasons (and best practices), the second way is the preferred way to deal with Zamzar keys. Therefore the following examples have been made with the `.Renviron` method in mind.  
+
+### `zz_format()`
+
+In general there's two use cases for the `zz_format()` function.  
+
+1. If you're curious about formats accepted by the Zamzar API, do `zz_format()` and inspect:
+
+```r
+zzlite::zz_format()
+
+#>      target
+#> 1       3g2
+#> 2       3ga
+#> 3       3gp
+#> 4      3gpp
+#> 5        7z
+#> 6       aac
+#> 7       ac3
+#> 8        ai
+#> 9       asf
+#> 10      avi
+#> 11      azw
+#> 12     azw3
+#> 13      bmp
+#> 14      cab
+#> 15      cbc
+#> 16      cbr
+#> 17      cbz
+#> 18      cdr
+#> 19      chm
+#> 20      csv
+#> 21     djvu
+#> 22      doc
+#> 23     docm
+#> 24     docx
+#> 25      dwg
+#> 26      dxf
+#> 27      emf
+#> 28      eml
+#> 29      eps
+#> 30     epub
+#> 31      fb2
+#> 32     flac
+#> 33      flv
+#> 34      gif
+#> 35      gvi
+#> 36      jpg
+#> 37      lit
+#> 38      lrf
+#> 39      lzh
+#> 40      m4a
+#> 41      m4r
+#> 42      m4v
+#> 43      mkv
+#> 44     mobi
+#> 45      mod
+#> 46      mov
+#> 47      mp3
+#> 48      mp4
+#> 49      mpg
+#> 50      msg
+#> 51      mts
+#> 52      odg
+#> 53      odp
+#> 54      ods
+#> 55      odt
+#> 56      ogg
+#> 57      pcx
+#> 58      pdb
+#> 59      pdf
+#> 60      pml
+#> 61      png
+#> 62      pps
+#> 63     ppsx
+#> 64      ppt
+#> 65     pptm
+#> 66     pptx
+#> 67      prc
+#> 68       ps
+#> 69      psd
+#> 70      pub
+#> 71       ra
+#> 72      ram
+#> 73      rar
+#> 74       rb
+#> 75       rm
+#> 76     rmvb
+#> 77      rtf
+#> 78      svg
+#> 79      tar
+#> 80  tar.bz2
+#> 81   tar.gz
+#> 82      tcr
+#> 83      tga
+#> 84     tiff
+#> 85       ts
+#> 86      txt
+#> 87      vob
+#> 88      wav
+#> 89     wbmp
+#> 90     webm
+#> 91     webp
+#> 92      wks
+#> 93      wma
+#> 94      wmf
+#> 95      wmv
+#> 96      wpd
+#> 97      wps
+#> 98      xlr
+#> 99      xls
+#> 100    xlsm
+#> 101    xlsx
+#> 102     xps
+#> 103     yz1
+#> 104     zip
+```
+
+2. If you're curious to know what a format can be converted to, as well as the cost for converting (in Zamzar credit), pass an accepted extension to the origin parameter, e.g.:  
+
+```r
+zzlite::zz_format(origin = "emf")
+
+#>       target cost
+#> 1        bmp    1
+#> 2        gif    1
+#> 3        ico    1
+#> 4        jpg    1
+#> 5        pcx    1
+#> 6        pdf    1
+#> 7        png    1
+#> 8         ps    1
+#> 9        tga    1
+#> 10 thumbnail    1
+#> 11      tiff    1
+#> 12      wbmp    1
+#> 13      webp    1
+```
+
+### `zz_post()`
+
+To do a conversion Zamzar needs a file (surprise!). Through `zzlite` you post a file to Zamzar by invoking `zz_post()` with the appropriate arguments, e.g.:
+
+```r
+zzlite::zz_post(file = "avatar.emf", extension = "png", prod = TRUE)
+
+#> 201
+
+```
+
+In the example above, `avatar.emf` is the file that we've requested Zamzar to convert. The extension is the extension/format we want the file to have _after_ conversion.  
+The prod boolean decides whether or not we should use a development endpoint or a production endpoint.  
+
+For more information on differences between endpoints, see: [test and production environments](https://developers.zamzar.com/docs) in the official Zamzar documentation.
+
+Please note that upon completion, `zz_post()` will respond with an HTTP status code. For details on these, see Zamzars official documentation on [response codes](https://developers.zamzar.com/docs).  
+
+### `zz_get_info()`
+
+So how do we get a file after we've posted it to Zamzar for conversion? `zz_get_info()` to the rescue!  
+
+Assuming that we've just posted the `avatar.emf` to Zamzar and have received a `201` response from the API, a subsequent invocation of `zz_get_info()` will return a dataframe like this:
+
+```r
+zzlite::zz_get_info()
+
+#>         id extension           created_at
+#> 1 61920043       emf 2020-02-02T13:41:53Z
+```
+
+This tells us, that a file with id `61920043` and an extension of `emf` is in the top of our stack of files associated with our Zamzar account.  
+
+Now, since we've asked Zamzar to convert _from_ `emf` to `png`, it might seem a bit strange that id `61920043` isn't a `png` file. The reason for this is simply because Zamzar (in this example) isn't done converting the file. If we wait a few seconds and then do a subsequent call to `zz_get_info()`, then we should see the converted file:
+
+```r
+zzlite::zz_get_info()
+
+#>         id extension           created_at
+#> 1 61920045       png 2020-02-02T13:41:55Z
+```
+
+And as expected, Zamzar is done with the conversion, and a file with a new id, `61920045`, and an extension of `png` is now in the top of our stack of files associated with our Zamzar account.  
+
+Sometimes it is nice to inspect the entire backlog of files for your Zamzar account. It is possible to inspect these by switching the parameter `latest` from `TRUE` to `FALSE` (the parameter defaults to `TRUE`):
+
+```r
+zzlite::zz_get_info(latest = FALSE)
+
+#>         id extension           created_at
+#> 1 61920045       png 2020-02-02T13:41:55Z
+#> 2 61920043       emf 2020-02-02T13:41:53Z
+```
+
+Now, how do we _get_ a file that has been converted?
+
+### `zz_get()`
+
+We can get a converted file by invoking `zz_get()` with appropriate arguments.  
+
+A minimal example for obtaining the converted avatar from the previous example would be:
+
+```r
+zzlite::zz_get(id = 61920045, extension = "png", prod = TRUE)
+
+#> Writing file 61920045.png to /Users/whatever/Documents/conversions
+```
+
+As indicated by the example above, `zz_get()` will  use the id as filename for the file we're _getting_ if no name has been set prior to invocation. The file will be written to the current working directory.  
+
+
+A slightly more coherent way to obtain a file, could be something around these lines:  
+
+```r
+df <- zz_get_info(latest = TRUE)
+zz_get(id = df$id, extension = df$extension, name = "avatar")
+
+#> Writing file avatar.gif to /Users/whatever/Documents/conversions
+
+```
+
+---
+
+> *Please note that the package has a strict focus on rather simple conversions via Zamzar (implied by the _lite_ suffix in the name). It is intentional that the package doesn't focus on deletion of files, cloud integration etc.  
