@@ -16,6 +16,7 @@ with_mock_api({
 
 test_that("zz_get_info throws a proper error if an invalid usr has been passed", {
   
-  testthat::expect_error(zz_get_info(usr = "foo"), "Whoops, we can't find any valid key!")
+  testthat::expect_error(zz_get_info(usr = "foo"),
+                         "Zamzar responded with API key was missing or invalid and a status code of: 401")
   
 })

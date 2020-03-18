@@ -315,33 +315,30 @@ code > span.er { color: #a61717; background-color: #e3d2d2; }
 
 
 
-<p>The <code>zzlite</code> package is a collection of functions that simplifies communication between R and the <a href="https://developers.zamzar.com/user">Zamzar Online file conversion</a> API.</p>
+<p>The <code>zzlite</code> package is a collection of wrappers that simplifies communication between R and the <a href="https://developers.zamzar.com/user">Zamzar Online file conversion</a> API.</p>
 <p>By utilizing <code>zzlite</code> (and thereby the Zamzar API) you can easily convert between <a href="https://developers.zamzar.com/formats">hundreds</a> of file formats from an R session.*</p>
 <div id="the-basics" class="section level2">
 <h2>The basics</h2>
-<p>The following section serves as a simple introduction to the <code>zzlite</code> package. Since Zamzar requires authentication, it is assumed that you have a valid (and not exhausted) key at your disposal. If not, go sign up via <a href="https://developers.zamzar.com/">Zamzar</a>s website to get one. Otherwise, keep on reading.</p>
+<p>The following section serves as a simple introduction to the <code>zzlite</code> package. Since Zamzar requires authentication, it is assumed that you have a valid key at your disposal. If not, go sign up via <a href="https://developers.zamzar.com/">Zamzar</a>s website to get one.</p>
 <div id="on-zamzar-api-keys-in-zzlite" class="section level3">
 <h3>On Zamzar API keys in <code>zzlite</code></h3>
 <p>There’s two ways in which you can pass a Zamzar key to <code>zzlite</code>.</p>
 <ol style="list-style-type: decimal">
 <li><p>Either by passing a hard coded Zamzar key as an argument to the <code>usr</code> parameter.</p></li>
-<li><p>Or by leveraging an <code>.Renviron</code> file. Simply create a variable called <code>ZAMZAR_USR</code> in your <code>.Renviron</code> and pass it a Zamzar key. If done successfully, you can skip passing a key to the <code>usr</code> parameter whenever you’re invoking <code>zzlite</code> functions.</p></li>
+<li><p>By leveraging an <code>.Renviron</code> file. Simply create a variable called <code>ZAMZAR_USR</code> in your <code>.Renviron</code> and pass it a Zamzar key. If done successfully, you can skip passing a key to the <code>usr</code> parameter whenever you’re invoking <code>zzlite</code> functions.</p></li>
 </ol>
 <center>
 <em>Example of .Renviron:</em>
 </center>
-<div class="sourceCode" id="cb1"><pre class="sourceCode sh"><code class="sourceCode bash"><span id="cb1-1"><a href="#cb1-1"></a><span class="co">## Zamzar key used by zzlite </span></span>
-<span id="cb1-2"><a href="#cb1-2"></a><span class="va">ZAMZAR_USR=</span>77c39dh6lo03g7598t98h659ihg99b7ny7213q</span>
-<span id="cb1-3"><a href="#cb1-3"></a></span>
-<span id="cb1-4"><a href="#cb1-4"></a></span>
-<span id="cb1-5"><a href="#cb1-5"></a></span></code></pre></div>
-<p>For security reasons (and best practices), the second way is the preferred way to deal with Zamzar keys. Therefore the following examples have been made with the <code>.Renviron</code> method in mind.</p>
+<div class="sourceCode" id="cb1"><pre class="sourceCode sh"><code class="sourceCode bash"><span id="cb1-1"><a href="#cb1-1"></a><span class="va">ZAMZAR_USR=</span>77c39dh6lo03g7598t98h659ihg99b7ny7213q</span>
+<span id="cb1-2"><a href="#cb1-2"></a></span></code></pre></div>
+<p>For security reasons, and best practices, the second way is the preferred way to deal with API keys. Therefore the following examples have been made with the <code>.Renviron</code> method in mind.</p>
 </div>
 <div id="zz_format" class="section level3">
 <h3><code>zz_format()</code></h3>
 <p>In general there’s two use cases for the <code>zz_format()</code> function.</p>
 <ol style="list-style-type: decimal">
-<li>If you’re curious about formats accepted by the Zamzar API, do <code>zz_format()</code> and inspect:</li>
+<li>If you’re curious about formats accepted by the Zamzar API, invoke <code>zz_format()</code> and inspect the supported formats:</li>
 </ol>
 <div class="sourceCode" id="cb2"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1"></a>zzlite<span class="op">::</span><span class="kw">zz_format</span>()</span>
 <span id="cb2-2"><a href="#cb2-2"></a></span>
@@ -472,30 +469,30 @@ code > span.er { color: #a61717; background-color: #e3d2d2; }
 </div>
 <div id="zz_post" class="section level3">
 <h3><code>zz_post()</code></h3>
-<p>To do a conversion Zamzar needs a file (surprise!). Through <code>zzlite</code> you post a file to Zamzar by invoking <code>zz_post()</code> with the appropriate arguments, e.g.:</p>
+<p>You convert a file from one format to another by invoking <code>zz_post()</code> with the appropriate arguments, e.g.:</p>
 <div class="sourceCode" id="cb4"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb4-1"><a href="#cb4-1"></a>zzlite<span class="op">::</span><span class="kw">zz_post</span>(<span class="dt">file =</span> <span class="st">&quot;avatar.emf&quot;</span>, <span class="dt">extension =</span> <span class="st">&quot;png&quot;</span>, <span class="dt">prod =</span> <span class="ot">TRUE</span>)</span>
 <span id="cb4-2"><a href="#cb4-2"></a></span>
 <span id="cb4-3"><a href="#cb4-3"></a><span class="co">#&gt; 201</span></span></code></pre></div>
-<p>In the example above, <code>avatar.emf</code> is the file that we’ve requested Zamzar to convert. The extension is the extension/format we want the file to have <em>after</em> conversion.<br />
-The prod boolean decides whether or not we should use a development endpoint or a production endpoint.</p>
+<p>In the example above, <code>avatar.emf</code> is the file that we’ve requested Zamzar to convert. The parameter <code>extension</code> is the extension/format we want the file to have <em>after</em> conversion.<br />
+The <code>prod</code> boolean decides whether or not we should use a development endpoint or a production endpoint.</p>
 <p>For more information on differences between endpoints, see: <a href="https://developers.zamzar.com/docs">test and production environments</a> in the official Zamzar documentation.</p>
-<p>Please note that upon completion, <code>zz_post()</code> will respond with an HTTP status code. For details on these, see Zamzars official documentation on <a href="https://developers.zamzar.com/docs">response codes</a>.</p>
+<p>Upon completion <code>zz_post()</code> will respond with an HTTP status code provided by the API. For details on these, see Zamzars official documentation on <a href="https://developers.zamzar.com/docs">response codes</a>.</p>
 </div>
 <div id="zz_get_info" class="section level3">
 <h3><code>zz_get_info()</code></h3>
-<p>So how do we get a file after we’ve posted it to Zamzar for conversion? <code>zz_get_info()</code> to the rescue!</p>
-<p>Assuming that we’ve just posted the <code>avatar.emf</code> to Zamzar and have received a <code>201</code> response from the API, a subsequent invocation of <code>zz_get_info()</code> will return a dataframe like this:</p>
+<p>To return a converted file from the Zamzar API, you need to know which file to get.</p>
+<p>Assuming that we’ve just posted the <code>avatar.emf</code> to Zamzar via <code>zz_post()</code> and have received a <code>201</code> response from the API, a subsequent invocation of <code>zz_get_info()</code> will return a dataframe like this:</p>
 <div class="sourceCode" id="cb5"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb5-1"><a href="#cb5-1"></a>zzlite<span class="op">::</span><span class="kw">zz_get_info</span>()</span>
 <span id="cb5-2"><a href="#cb5-2"></a></span>
 <span id="cb5-3"><a href="#cb5-3"></a><span class="co">#&gt;         id extension           created_at</span></span>
 <span id="cb5-4"><a href="#cb5-4"></a><span class="co">#&gt; 1 61920043       emf 2020-02-02T13:41:53Z</span></span></code></pre></div>
 <p>This tells us, that a file with id <code>61920043</code> and an extension of <code>emf</code> is in the top of our stack of files associated with our Zamzar account.</p>
-<p>Now, since we’ve asked Zamzar to convert <em>from</em> <code>emf</code> to <code>png</code>, it might seem a bit strange that id <code>61920043</code> isn’t a <code>png</code> file. The reason for this is simply because Zamzar (in this example) isn’t done converting the file. If we wait a few seconds and then do a subsequent call to <code>zz_get_info()</code>, then we should see the converted file:</p>
+<p>Now, since we’ve asked Zamzar to convert <em>from</em> <code>emf</code> <em>to</em> <code>png</code>, it might seem a bit strange that id <code>61920043</code> isn’t a <code>png</code> file. The reason for this is simply because Zamzar (in this example) isn’t done converting the file. If we wait a few seconds and then do a subsequent call to <code>zz_get_info()</code>, then we should see the converted file:</p>
 <div class="sourceCode" id="cb6"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb6-1"><a href="#cb6-1"></a>zzlite<span class="op">::</span><span class="kw">zz_get_info</span>()</span>
 <span id="cb6-2"><a href="#cb6-2"></a></span>
 <span id="cb6-3"><a href="#cb6-3"></a><span class="co">#&gt;         id extension           created_at</span></span>
 <span id="cb6-4"><a href="#cb6-4"></a><span class="co">#&gt; 1 61920045       png 2020-02-02T13:41:55Z</span></span></code></pre></div>
-<p>And as expected, Zamzar is done with the conversion, and a file with a new id, <code>61920045</code>, and an extension of <code>png</code> is now in the top of our stack of files associated with our Zamzar account.</p>
+<p>And as expected, Zamzar is done with the conversion, and a file with a new id, <code>61920045</code>, and an extension of <code>png</code>, is now in the top of our stack of files associated with our Zamzar account.</p>
 <p>Sometimes it is nice to inspect the entire backlog of files for your Zamzar account. It is possible to inspect these by switching the parameter <code>latest</code> from <code>TRUE</code> to <code>FALSE</code> (the parameter defaults to <code>TRUE</code>):</p>
 <div class="sourceCode" id="cb7"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb7-1"><a href="#cb7-1"></a>zzlite<span class="op">::</span><span class="kw">zz_get_info</span>(<span class="dt">latest =</span> <span class="ot">FALSE</span>)</span>
 <span id="cb7-2"><a href="#cb7-2"></a></span>
@@ -517,9 +514,21 @@ The prod boolean decides whether or not we should use a development endpoint or 
 <span id="cb9-2"><a href="#cb9-2"></a><span class="kw">zz_get</span>(<span class="dt">id =</span> df<span class="op">$</span>id, <span class="dt">extension =</span> df<span class="op">$</span>extension, <span class="dt">name =</span> <span class="st">&quot;avatar&quot;</span>)</span>
 <span id="cb9-3"><a href="#cb9-3"></a></span>
 <span id="cb9-4"><a href="#cb9-4"></a><span class="co">#&gt; Writing file avatar.gif to /Users/whatever/Documents/conversions</span></span></code></pre></div>
+</div>
+<div id="zz_delete" class="section level3">
+<h3><code>zz_delete()</code></h3>
+<p>If you need to, you can delete files from your Zamzar stack. Deletion is done by invoking <code>zz_delete()</code> with a file <code>id</code> obtained via <code>zz_get_info()</code>. Building upon the previous example, we could delete the <code>.png</code> file we just downloaded:</p>
+<div class="sourceCode" id="cb10"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb10-1"><a href="#cb10-1"></a>zzlite<span class="op">::</span><span class="kw">zz_delete</span>(<span class="dt">id =</span> <span class="st">&quot;61920045&quot;</span>)</span>
+<span id="cb10-2"><a href="#cb10-2"></a></span>
+<span id="cb10-3"><a href="#cb10-3"></a><span class="co">#&gt; 200  </span></span></code></pre></div>
+<p>If you want more information than a mere status code upon executing <code>zz_delete()</code>, switch the <code>verbose</code> parameter to <code>TRUE</code>. E.g.:</p>
+<div class="sourceCode" id="cb11"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb11-1"><a href="#cb11-1"></a>zzlite<span class="op">::</span><span class="kw">zz_delete</span>(<span class="dt">id =</span> <span class="st">&quot;61920043&quot;</span>, <span class="dt">verbose =</span> <span class="ot">TRUE</span>)</span>
+<span id="cb11-2"><a href="#cb11-2"></a></span>
+<span id="cb11-3"><a href="#cb11-3"></a><span class="co">#&gt;         id status_code          deleted_at</span></span>
+<span id="cb11-4"><a href="#cb11-4"></a><span class="co">#&gt; 1 61920043         200 2020-02-02 13:52:33  </span></span></code></pre></div>
 <hr />
 <blockquote>
-<p>*Please note that the package has a strict focus on rather simple conversions via Zamzar (implied by the <em>lite</em> suffix in the name). It is intentional that the package doesn’t focus on deletion of files, cloud integration etc.</p>
+<p>*Please note that the package has a strict focus on rather simple conversions via Zamzar (implied by the <em>lite</em> suffix in the name). It is intentional that the package doesn’t focus on cloud integration etc.</p>
 </blockquote>
 </div>
 </div>

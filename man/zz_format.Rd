@@ -21,8 +21,8 @@ the accepted formats by the Zamzar API is returned.
 
 See: \url{https://developers.zamzar.com/formats}}
 
-\item{usr}{The username/API key you are using. If not set, \code{zz_format()}
-will see if a key exists as a \code{ZAMZAR_USR} variable  in \code{.Renviron} and use that.
+\item{usr}{The username/API key you are using. If not set, the function
+will check if a key exists as a \code{ZAMZAR_USR} variable  in \code{.Renviron} and use that.
 
 See: \url{https://developers.zamzar.com/user}}
 }
@@ -31,7 +31,7 @@ Either a dataframe of formats that you can convert to, or a
 dataframe of accepted origin formats.
 }
 \description{
-Get a dataframe of all the formats accepted by Zamzar, or a dataframe of formats
+Get dataframe of all the formats accepted by Zamzar. Alternatively, a dataframe of formats
 you can convert an origin to.
 }
 \details{

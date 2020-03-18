@@ -1,6 +1,6 @@
 #' Get info from Zamzar
 #' 
-#' Get info on the files submitted to the Zamzar API via your current key.
+#' Get info on files submitted to Zamzar by account.
 #'
 #' Per default `zz_get_info()` assumes you want information for the last 
 #' submitted file. To get information on all the files that have been submitted
@@ -14,8 +14,8 @@
 #' Zamzar key extracted from an `.Renviron`.  
 #'
 #'
-#' @param usr The username/API key you are using. If not set, `zz_format()`
-#' will see if a key exists as a `ZAMZAR_USR` variable  in `.Renviron` and use that.    
+#' @param usr The username/API key you are using. If not set, the function
+#' will check if a key exists as a `ZAMZAR_USR` variable  in `.Renviron` and use that.    
 #' 
 #' See: \url{https://developers.zamzar.com/user}
 #'
@@ -45,43 +45,51 @@
 #' # submitted file will be returned.
 #' zz_get_info()
 #' 
-#' # Same as above, we're just passing the key manually.
+#' # Same as above, we're just passing the key in a variable.
 #' zz_get_info(usr = "key")
 #'  
 #' # Provided a valid token, will return metadata for all files
 #' # submitted to the API within a reasonable time frame.
 #' zz_get_info(usr = "key", latest = FALSE)
 #' 
-#' # Same as above, we're just using the .Renviron.
+#' # Same as above, we're just utilizing .Renviron.
 #' zz_get_info(latest = FALSE)
 #' }
 
 zz_get_info <- function(usr = NULL, latest = TRUE) {
   
-  endpoint <- .zz_endpoint()$prod[[2]]
+  endpoint <- zz_config[['prod']][[2]]
   
   usr <- .zz_get_key(usr = usr)
   
   response <- httr::GET(url = endpoint,
-                      config = .zz_authenticate(usr)
+                      config = .zz_authenticate(usr),
+                      .zz_user_agent()
   )
   
   content <- .zz_parse_response(response = response)
   
-  # Null so we must have passed a key that isn't accepted
-  if (is.null(content$data$id[[1]]) && is.null(content$data$id[[1]]) && is.null(content$data$created_at[[1]])) {
-    stop("Whoops, we can't find any valid key!")
+  if (!response[['status_code']]  == 200) {
+    stop(sprintf("Zamzar responded with %s and a status code of: %d",
+                 content[['errors']][['message']],
+                 response[['status_code']]
+                 )
+    )
   }
-
+  
+  if (isTRUE(content[['paging']][['total_count']] == 0) && isTRUE(content[['paging']][['limit']] == 50)) {
+    stop("Seems like Zamzar doesn't store any files submitted by this account!")
+  }
+  
   if (latest == TRUE) {
-    res <- data.frame(id = content$data$id[[1]],
-                      extension = content$data$format[[1]],
-                      created_at = content$data$created_at[[1]],
+    res <- data.frame(id = content[['data']][['id']][[1]],
+                      extension = content[['data']][['format']][[1]],
+                      created_at = content[['data']][['created_at']][[1]],
                       stringsAsFactors = FALSE)
   } else {
-    res <- data.frame(id = content$data$id,
-                      extension = content$data$format,
-                      created_at = content$data$created_at,
+    res <- data.frame(id = content[['data']][['id']],
+                      extension = content[['data']][['format']],
+                      created_at = content[['data']][['created_at']],
                       stringsAsFactors = FALSE)
   }
   

@@ -1,29 +1,3 @@
-# .zzz_endpoint
-#' 
-#' Auxiliary function
-#' 
-#' Holds Zamzar API endpoints
-#' 
-#' @keywords internal
-.zz_endpoint <- function() {
-  
-  prod <- list(
-    post <- c("https://api.zamzar.com/v1/jobs"),
-    get <- c("https://api.zamzar.com/v1/files/")
-  )
-  
-  dev <- list (
-    post <- c("https://sandbox.zamzar.com/v1/jobs"),
-    get <- c("https://sandbox.zamzar.com/v1/files/")
-  )
-  
-  format <- list(
-    format <- c("https://sandbox.zamzar.com/v1/formats")
-  )
-  
-  conf <- list(prod = prod, dev = dev, format = format)
-}
-
 # .zz_endpoint_content
 #' 
 #' Auxiliary function
@@ -77,6 +51,15 @@
   content <- jsonlite::fromJSON(content, flatten = TRUE)
 }
 
+# .zz_user_agent
+#' 
+#' Auxiliary wrapper for user agent
+#'  
+#' @keywords internal
+.zz_user_agent <- function() {
+  httr::user_agent("zzlite - https://github.com/fkoh111/zzlite")
+}
+
 # .zz_do_paging
 #' 
 #' Auxiliary function
@@ -85,24 +68,25 @@
 #' 
 #' @keywords internal
 .zz_do_paging <- function(content, container, endpoint, usr) {
-  if (content$paging$total_count > length(content$data$name)) {
+  if (content[['paging']][['total_count']] > length(content[['data']][['name']])) {
     
     storage <- list()
 
-    counter <- ceiling(content$paging$total_count / length(content$data$name))
+    counter <- ceiling(content[['paging']][['total_count']] / length(content[['data']][['name']]))
     
     for(i in 1:counter) {
-      state_last_target <- content$paging$last
+      state_last_target <- content[['paging']][['last']]
       
       paged_endpoint <- httr::modify_url(endpoint, query = list(after=state_last_target))
       
       paged_response <- httr::GET(paged_endpoint,
-                                  config = .zz_authenticate(usr)
+                                  config = .zz_authenticate(usr),
+                                  .zz_user_agent()
       )
       
       content <- .zz_parse_response(response = paged_response)
       
-      temp <- data.frame(target = content$data$name,
+      temp <- data.frame(target = content[['data']][['name']],
                          stringsAsFactors = FALSE)
       
       storage[[i]] <- temp

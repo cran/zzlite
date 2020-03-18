@@ -14,13 +14,13 @@ knitr::opts_chunk$set(
 )
 ```
 
-The `zzlite` package is a collection of functions that simplifies communication between R and the [Zamzar Online file conversion](https://developers.zamzar.com/user) API.  
+The `zzlite` package is a collection of wrappers that simplifies communication between R and the [Zamzar Online file conversion](https://developers.zamzar.com/user) API.  
 
 By utilizing `zzlite` (and thereby the Zamzar API) you can easily convert between [hundreds](https://developers.zamzar.com/formats) of file formats from an R session.*  
 
 ## The basics
 
-The following section serves as a simple introduction to the `zzlite` package. Since Zamzar requires authentication, it is assumed that you have a valid (and not exhausted) key at your disposal. If not, go sign up via [Zamzar](https://developers.zamzar.com/)s website to get one. Otherwise, keep on reading.  
+The following section serves as a simple introduction to the `zzlite` package. Since Zamzar requires authentication, it is assumed that you have a valid key at your disposal. If not, go sign up via [Zamzar](https://developers.zamzar.com/)s website to get one.  
 
 
 ### On Zamzar API keys in `zzlite`
@@ -29,26 +29,23 @@ There's two ways in which you can pass a Zamzar key to `zzlite`.
 
 1. Either by passing a hard coded Zamzar key as an argument to the `usr` parameter.  
 
-2. Or by leveraging an `.Renviron` file. Simply create a variable called `ZAMZAR_USR` in your `.Renviron` and pass it a Zamzar key. If done successfully, you can skip passing a key to the `usr` parameter whenever you're invoking `zzlite` functions.  
+2. By leveraging an `.Renviron` file. Simply create a variable called `ZAMZAR_USR` in your `.Renviron` and pass it a Zamzar key. If done successfully, you can skip passing a key to the `usr` parameter whenever you're invoking `zzlite` functions.  
 
 
 <center>_Example of .Renviron:_</center>
 ```sh
-## Zamzar key used by zzlite 
 ZAMZAR_USR=77c39dh6lo03g7598t98h659ihg99b7ny7213q
-
-
 
 
 ```
 
-For security reasons (and best practices), the second way is the preferred way to deal with Zamzar keys. Therefore the following examples have been made with the `.Renviron` method in mind.  
+For security reasons, and best practices, the second way is the preferred way to deal with API keys. Therefore the following examples have been made with the `.Renviron` method in mind.  
 
 ### `zz_format()`
 
 In general there's two use cases for the `zz_format()` function.  
 
-1. If you're curious about formats accepted by the Zamzar API, do `zz_format()` and inspect:
+1. If you're curious about formats accepted by the Zamzar API, invoke `zz_format()` and inspect the supported formats:
 
 ```r
 zzlite::zz_format()
@@ -183,7 +180,7 @@ zzlite::zz_format(origin = "emf")
 
 ### `zz_post()`
 
-To do a conversion Zamzar needs a file (surprise!). Through `zzlite` you post a file to Zamzar by invoking `zz_post()` with the appropriate arguments, e.g.:
+You convert a file from one format to another by invoking `zz_post()` with the appropriate arguments, e.g.:
 
 ```r
 zzlite::zz_post(file = "avatar.emf", extension = "png", prod = TRUE)
@@ -192,18 +189,18 @@ zzlite::zz_post(file = "avatar.emf", extension = "png", prod = TRUE)
 
 ```
 
-In the example above, `avatar.emf` is the file that we've requested Zamzar to convert. The extension is the extension/format we want the file to have _after_ conversion.  
-The prod boolean decides whether or not we should use a development endpoint or a production endpoint.  
+In the example above, `avatar.emf` is the file that we've requested Zamzar to convert. The parameter `extension` is the extension/format we want the file to have _after_ conversion.  
+The `prod` boolean decides whether or not we should use a development endpoint or a production endpoint.  
 
 For more information on differences between endpoints, see: [test and production environments](https://developers.zamzar.com/docs) in the official Zamzar documentation.
 
-Please note that upon completion, `zz_post()` will respond with an HTTP status code. For details on these, see Zamzars official documentation on [response codes](https://developers.zamzar.com/docs).  
+Upon completion `zz_post()` will respond with an HTTP status code provided by the API. For details on these, see Zamzars official documentation on [response codes](https://developers.zamzar.com/docs).  
 
 ### `zz_get_info()`
 
-So how do we get a file after we've posted it to Zamzar for conversion? `zz_get_info()` to the rescue!  
+To return a converted file from the Zamzar API, you need to know which file to get.
 
-Assuming that we've just posted the `avatar.emf` to Zamzar and have received a `201` response from the API, a subsequent invocation of `zz_get_info()` will return a dataframe like this:
+Assuming that we've just posted the `avatar.emf` to Zamzar via `zz_post()` and have received a `201` response from the API, a subsequent invocation of `zz_get_info()` will return a dataframe like this:
 
 ```r
 zzlite::zz_get_info()
@@ -214,7 +211,7 @@ zzlite::zz_get_info()
 
 This tells us, that a file with id `61920043` and an extension of `emf` is in the top of our stack of files associated with our Zamzar account.  
 
-Now, since we've asked Zamzar to convert _from_ `emf` to `png`, it might seem a bit strange that id `61920043` isn't a `png` file. The reason for this is simply because Zamzar (in this example) isn't done converting the file. If we wait a few seconds and then do a subsequent call to `zz_get_info()`, then we should see the converted file:
+Now, since we've asked Zamzar to convert _from_ `emf` _to_ `png`, it might seem a bit strange that id `61920043` isn't a `png` file. The reason for this is simply because Zamzar (in this example) isn't done converting the file. If we wait a few seconds and then do a subsequent call to `zz_get_info()`, then we should see the converted file:
 
 ```r
 zzlite::zz_get_info()
@@ -223,7 +220,7 @@ zzlite::zz_get_info()
 #> 1 61920045       png 2020-02-02T13:41:55Z
 ```
 
-And as expected, Zamzar is done with the conversion, and a file with a new id, `61920045`, and an extension of `png` is now in the top of our stack of files associated with our Zamzar account.  
+And as expected, Zamzar is done with the conversion, and a file with a new id, `61920045`, and an extension of `png`, is now in the top of our stack of files associated with our Zamzar account.  
 
 Sometimes it is nice to inspect the entire backlog of files for your Zamzar account. It is possible to inspect these by switching the parameter `latest` from `TRUE` to `FALSE` (the parameter defaults to `TRUE`):
 
@@ -262,6 +259,25 @@ zz_get(id = df$id, extension = df$extension, name = "avatar")
 
 ```
 
+### `zz_delete()`
+
+If you need to, you can delete files from your Zamzar stack. Deletion is done by invoking `zz_delete()` with a file `id` obtained via `zz_get_info()`. Building upon the previous example, we could delete the `.png` file we just downloaded:
+
+```r
+zzlite::zz_delete(id = "61920045")
+
+#> 200  
+```
+
+If you want more information than a mere status code upon executing `zz_delete()`, switch the `verbose` parameter to `TRUE`. E.g.:
+
+```r
+zzlite::zz_delete(id = "61920043", verbose = TRUE)
+
+#>         id status_code          deleted_at
+#> 1 61920043         200 2020-02-02 13:52:33  
+```
+
 ---
 
-> *Please note that the package has a strict focus on rather simple conversions via Zamzar (implied by the _lite_ suffix in the name). It is intentional that the package doesn't focus on deletion of files, cloud integration etc.  
+> *Please note that the package has a strict focus on rather simple conversions via Zamzar (implied by the _lite_ suffix in the name). It is intentional that the package doesn't focus on cloud integration etc.  

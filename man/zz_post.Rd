@@ -17,8 +17,8 @@ zz_post(
 
 \item{extension}{The file type you want to convert to. E.g., `png`.}
 
-\item{usr}{The username/API key you are using. If not set, `zz_format()`
-will see if a key exists as a `ZAMZAR_USR` variable  in `.Renviron` and use that.    
+\item{usr}{The username/API key you are using. If not set, the function
+will check if a key exists as a `ZAMZAR_USR` variable  in `.Renviron` and use that.    
 
 See: \url{https://developers.zamzar.com/user}}
 
@@ -36,6 +36,8 @@ Per default `zz_post()` assumes that you're doing development, thus using a
 development endpoint. Set parameter `prod` to `TRUE` to change this behavior.
 }
 \details{
+On differences between endpoints, see: \url{https://developers.zamzar.com/docs#section-Next_steps} and  \url{https://developers.zamzar.com/docs#section-Rate_Limits}
+
 Please note that a Zamzar key passed as argument to `usr` takes precedence over a
 Zamzar key extracted from an `.Renviron`.
 }

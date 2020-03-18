@@ -2,6 +2,8 @@
 #' 
 #' Per default `zz_post()` assumes that you're doing development, thus using a 
 #' development endpoint. Set parameter `prod` to `TRUE` to change this behavior.  
+#' 
+#' On differences between endpoints, see: \url{https://developers.zamzar.com/docs#section-Next_steps} and  \url{https://developers.zamzar.com/docs#section-Rate_Limits}
 #'
 #' Please note that a Zamzar key passed as argument to `usr` takes precedence over a
 #' Zamzar key extracted from an `.Renviron`.  
@@ -13,8 +15,8 @@
 #' 
 #' @seealso \code{\link{zz_format}} for a list of formats you can convert to.
 #' 
-#' @param usr The username/API key you are using. If not set, `zz_format()`
-#' will see if a key exists as a `ZAMZAR_USR` variable  in `.Renviron` and use that.    
+#' @param usr The username/API key you are using. If not set, the function
+#' will check if a key exists as a `ZAMZAR_USR` variable  in `.Renviron` and use that.    
 #' 
 #' See: \url{https://developers.zamzar.com/user}
 #' 
@@ -57,11 +59,11 @@ zz_post <- function(file = NULL, extension = NULL, usr = NULL, prod = FALSE, ver
   usr <- .zz_get_key(usr = usr)
   
   if (prod == FALSE) {
-    endpoint <- .zz_endpoint()$dev[[1]]
+    endpoint <- zz_config[['dev']][[1]]
   } 
   
   if (prod == TRUE) {
-    endpoint <- .zz_endpoint()$prod[[1]]
+    endpoint <- zz_config[['prod']][[1]]
   }
   
   body <- list(source_file = httr::upload_file(path = file),
@@ -69,17 +71,18 @@ zz_post <- function(file = NULL, extension = NULL, usr = NULL, prod = FALSE, ver
   
   response <- httr::POST(url = endpoint,
        config = .zz_authenticate(usr),
-       body = body
+       body = body,
+       .zz_user_agent()
   )
   
-  res <- data.frame(status = response$status_code,
-                    endpoint = response$url,
-                    date = response$date)
+  res <- data.frame(status = response[['status_code']],
+                    endpoint = response[['url']],
+                    date = response[['date']])
   
   if (verbose == TRUE) {
     res <- res
   } else {
-    res <- res$status
+    res <- res[['status']]
   }
   
   return(res)
